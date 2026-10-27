@@ -1,0 +1,9 @@
+'use client';
+import { useEffect, useRef } from 'react';
+import { X } from 'lucide-react';
+const modalStack:HTMLElement[]=[];let originalOverflow='';
+export default function Modal({children,onClose,label,className=''}:{children:React.ReactNode;onClose:()=>void;label:string;className?:string}){
+ const ref=useRef<HTMLDivElement>(null);
+ useEffect(()=>{const previous=document.activeElement as HTMLElement|null;const element=ref.current;if(!modalStack.length)originalOverflow=document.body.style.overflow;if(element)modalStack.push(element);document.body.style.overflow='hidden';ref.current?.focus();const key=(e:KeyboardEvent)=>{if(modalStack[modalStack.length-1]!==element)return;if(e.key==='Escape'){e.stopImmediatePropagation();onClose();}if(e.key==='Tab'){const nodes=ref.current?.querySelectorAll<HTMLElement>('a[href],button:not([disabled]),input:not([disabled]),textarea,select,[tabindex="0"]');if(!nodes?.length)return;const first=nodes[0],last=nodes[nodes.length-1];if(e.shiftKey&&(document.activeElement===first||document.activeElement===ref.current)){e.preventDefault();last.focus()}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus()}}};document.addEventListener('keydown',key);return()=>{if(element){const index=modalStack.indexOf(element);if(index>=0)modalStack.splice(index,1)}if(!modalStack.length)document.body.style.overflow=originalOverflow;document.removeEventListener('keydown',key);if(previous?.isConnected)previous.focus()}},[onClose]);
+ return <div className="modal-backdrop" onMouseDown={e=>{if(e.target===e.currentTarget)onClose()}}><div className={'modal '+className} role="dialog" aria-modal="true" aria-label={label} tabIndex={-1} ref={ref}><button className="modal-close" onClick={onClose} aria-label="Close"><X size={18}/></button>{children}</div></div>
+}
