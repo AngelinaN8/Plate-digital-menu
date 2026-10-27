@@ -1,7 +1,5 @@
+import {findUpload} from "@/db/store";
 import {env} from 'cloudflare:workers';
-import {and,eq} from 'drizzle-orm';
-import {getDb} from '@/db';
-import {uploads} from '@/db/schema';
 import {owner,getOwnMenu,failure,ApiError} from '@/lib/menu-server';
 import {normalizeMenu} from '@/lib/menu-types';
 import {guestNutrition,NUTRITION_DISCLAIMER} from '@/lib/nutrition';
@@ -17,7 +15,7 @@ export async function GET(request:Request){
    if(!path)return '';if(images.has(path))return images.get(path)!;
    let result=path;
    if(path.startsWith('/api/images/')){
-    const id=path.slice('/api/images/'.length);const upload=await getDb().select().from(uploads).where(and(eq(uploads.id,id),eq(uploads.ownerId,ownerId))).get();
+    const id=path.slice('/api/images/'.length);const upload=await findUpload(id,ownerId);
     const object=upload&&env.BUCKET?await env.BUCKET.get(upload.objectKey):null;
     if(!object||!upload)return '';
     total+=object.size;if(total>20*1024*1024)throw new ApiError(413,'This export contains more than 20 MB of photos. Use smaller photos or download the JSON backup.');

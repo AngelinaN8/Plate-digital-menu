@@ -1,6 +1,5 @@
+import {createUpload} from "@/db/store";
 import { env } from "cloudflare:workers";
-import { getDb } from "@/db";
-import { uploads } from "@/db/schema";
 import { owner, checkOrigin, failure, json, ApiError, readLimitedBody } from "@/lib/menu-server";
 
 export const dynamic = "force-dynamic";
@@ -32,7 +31,7 @@ export async function POST(request: Request) {
     const objectKey = `menus/${id}`;
     await env.BUCKET.put(objectKey, bytes, { httpMetadata: { contentType: mime } });
     const now = new Date().toISOString();
-    try { await getDb().insert(uploads).values({ id, ownerId, objectKey, mime, rightsConfirmedAt: now, rightsSource: "restaurant-attested-original-or-licensed", createdAt: now }); }
+    try { await createUpload({id,ownerId,objectKey,mime,rightsConfirmedAt:now,rightsSource:"restaurant-attested-original-or-licensed",createdAt:now}); }
     catch (error) { await env.BUCKET.delete(objectKey); throw error; }
     return json({ id, url: `/api/images/${id}` }, 201);
   } catch (error) { return failure(error); }

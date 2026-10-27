@@ -26,6 +26,7 @@ export type Dish = {
 };
 
 export type Weekday = "Mon" | "Tue" | "Wed" | "Thu" | "Fri" | "Sat" | "Sun";
+export type OfferItem = { dishId: string; price: number | null; note: string };
 
 export type MenuEvent = {
   id: string;
@@ -40,6 +41,7 @@ export type MenuEvent = {
   timezone: string;
   image?: string;
   afterCategory?: string;
+  includedDishes?: OfferItem[];
 };
 
 export type Menu = {
@@ -56,6 +58,7 @@ export type Menu = {
     days: Weekday[];
     image?: string;
     afterCategory?: string;
+    includedDishes?: OfferItem[];
   };
   events: MenuEvent[];
   dishes: Dish[];
@@ -75,14 +78,15 @@ export function normalizeMenu(menu: Menu): Menu {
       days: menu.promotion?.days ?? [],
       image: menu.promotion?.image ?? "",
       afterCategory: menu.promotion?.afterCategory ?? "",
+      includedDishes: menu.promotion?.includedDishes ?? [],
     },
   };
 }
 
 // Illustrative sample content. These photographs and generated concept images do not verify a real dish.
 export const DEFAULT_MENU: Menu = {
-  restaurantName: "Sora Social",
-  tagline: "Good plates. Better nights.",
+  restaurantName: "The Terrace",
+  tagline: "A little Mediterranean. A little unexpected.",
   currency: "AED",
   accent: "#6c4bf4",
   template: "gallery",
@@ -99,14 +103,16 @@ export const DEFAULT_MENU: Menu = {
       description: "Unlimited rosé during our ladies’ happy hour. Ask the team for package details.",
       enabled: true, recurrence: "weekly", days: ["Wed"], date: "",
       startTime: "17:00", endTime: "20:00", timezone: "Asia/Dubai",
-      image: "https://images.unsplash.com/photo-1747445666097-79d068882681?auto=format&fit=crop&w=1200&q=85", afterCategory: "Starters",
+      image: "https://images.unsplash.com/photo-1747445666097-79d068882681?auto=format&fit=crop&w=1200&q=85", afterCategory: "__top",
+      includedDishes: [{dishId:"whispering-angel",price:0,note:"150 ml glass · included for ladies during Wednesday happy hour, 17:00–20:00"}],
     },
     {
       id: "tuna-sunday", title: "The Sunday tuna cutting",
       description: "Join us for a live tuna cutting on the last Sunday of each month. Ask the team for details.",
       enabled: true, recurrence: "last-weekday-monthly", days: ["Sun"], date: "",
       startTime: "13:00", endTime: "15:00", timezone: "Asia/Dubai",
-      image: "https://images.unsplash.com/photo-1579871494447-9811cf80d66c?auto=format&fit=crop&w=1200&q=85", afterCategory: "Mains",
+      image: "/images/tuna-cutting-licensed.jpg", afterCategory: "__top",
+      includedDishes: [{dishId:"tuna-steak",price:null,note:"Fresh from the live cutting · menu price applies"},{dishId:"tuna-sashimi",price:null,note:"Sliced to order · menu price applies"},{dishId:"tuna-ceviche",price:null,note:"Citrus-cured · menu price applies"}],
     },
   ],
   dishes: [
@@ -136,6 +142,30 @@ export const DEFAULT_MENU: Menu = {
       allergens: ["Milk", "Wheat", "Sulphites"],
       image: "/images/steak-rossini-concept.webp",
       available: true,
+    },
+    {
+      id: "whispering-angel", name: "Whispering Angel Rosé", category: "Wine", price: 30,
+      description: "A pale, dry rosé. One glass, a little sunshine, no rush.",
+      portion: "150 ml glass", preparation: "Served chilled in a stemmed wine glass.",
+      allergens: ["Sulphites"], image: "https://images.unsplash.com/photo-1747445666097-79d068882681?auto=format&fit=crop&w=1200&q=85", available: true,
+    },
+    {
+      id: "tuna-steak", name: "Tuna steak", category: "Mains", price: 148,
+      description: "Seared tuna, sesame, citrus and seasonal greens.", portion: "Main · example portion · serves one",
+      preparation: "A whole tuna steak, lightly seared with a pink centre. Ask your server about cooking preferences.",
+      allergens: ["Fish", "Sesame", "Soy"], image: "", available: true,
+    },
+    {
+      id: "tuna-sashimi", name: "Tuna sashimi", category: "Starters", price: 98,
+      description: "Fresh tuna slices with ponzu, wasabi and pickled ginger.", portion: "Six slices · example serving",
+      preparation: "Sliced raw tuna, served chilled with condiments alongside.",
+      allergens: ["Fish", "Soy", "Wheat"], image: "", available: true,
+    },
+    {
+      id: "tuna-ceviche", name: "Tuna ceviche", category: "Starters", price: 92,
+      description: "Tuna, lime, cucumber, red onion and fresh herbs.", portion: "Starter · example portion · serves one",
+      preparation: "Small tuna cubes in a citrus dressing, served chilled.",
+      allergens: ["Fish"], image: "https://images.unsplash.com/photo-1619718672497-ce966f458bfe?auto=format&fit=crop&w=1200&q=85", available: true,
     },
     {
       id: "house-cocktail", name: "House whisky cocktail", category: "Cocktails", price: 48,

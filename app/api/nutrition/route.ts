@@ -1,7 +1,5 @@
+import {reserveAi,pruneAi} from '@/db/store';
 import { env } from 'cloudflare:workers';
-import { sql, lt } from 'drizzle-orm';
-import { getDb } from '@/db';
-import { aiUsage } from '@/db/schema';
 import { owner, checkOrigin, readLimitedBody, json, failure, ApiError } from '@/lib/menu-server';
 import { parseNutrition } from '@/lib/nutrition';
 
@@ -10,8 +8,8 @@ const key = () => env.OPENAI_API_KEY || process.env.OPENAI_API_KEY;
 export async function GET() { try { await owner(); return json({available:Boolean(key())}); } catch(e) { return failure(e); } }
 
 async function reserve(scope:string, limit:number, day:string) {
-  const rows = await getDb().insert(aiUsage).values({key:scope+':'+day,day,count:1}).onConflictDoUpdate({target:aiUsage.key,set:{count:sql`${aiUsage.count} + 1`},setWhere:sql`${aiUsage.count} < ${limit}`}).returning({count:aiUsage.count});
-  if (!rows.length) throw new ApiError(429,'Today’s AI estimate limit has been reached. You can still enter restaurant-provided values.');
+  const accepted = await reserveAi(scope+':'+day,day,limit);
+  if (!accepted) throw new ApiError(429,'Today’s AI estimate limit has been reached. You can still enter restaurant-provided values.');
 }
 
 export async function POST(request:Request) {
@@ -27,7 +25,7 @@ export async function POST(request:Request) {
     await reserve('global',100,day);
     await reserve(ownerId,20,day);
     const cutoff=new Date(Date.now()-90*86400000).toISOString().slice(0,10);
-    await getDb().delete(aiUsage).where(lt(aiUsage.day,cutoff));
+    await pruneAi(cutoff);
     const schema={type:'object',additionalProperties:false,required:['sufficient','energyKcal','proteinG','carbsG','fatG','notes'],properties:{sufficient:{type:'boolean'},energyKcal:{type:['number','null']},proteinG:{type:['number','null']},carbsG:{type:['number','null']},fatG:{type:['number','null']},notes:{type:'string'}}};
     let response:Response;
     try {

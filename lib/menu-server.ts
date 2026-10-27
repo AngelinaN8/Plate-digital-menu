@@ -1,7 +1,5 @@
+import {findMenu,createMenu,findUpload,type MenuRow} from "@/db/store";
 import { getChatGPTUser } from "@/app/chatgpt-auth";
-import { getDb } from "@/db";
-import { menus, uploads } from "@/db/schema";
-import { and, eq } from "drizzle-orm";
 import { DEFAULT_MENU, normalizeMenu, type Menu, type Dish, type MenuEvent, type Weekday } from "./menu-types";
 
 import { parseNutrition } from "./nutrition";
@@ -57,17 +55,16 @@ export function failure(error: unknown) {
 }
 
 export async function getOwnMenu(ownerId: string) {
-  const db = getDb();
-  let row = await db.select().from(menus).where(eq(menus.ownerId, ownerId)).get();
+  let row = await findMenu(ownerId);
   if (!row) {
-    await db.insert(menus).values({ ownerId, slug: `menu-${crypto.randomUUID().replaceAll("-", "").slice(0, 16)}`, draft: JSON.stringify(DEFAULT_MENU), updatedAt: new Date().toISOString() }).onConflictDoNothing();
-    row = await db.select().from(menus).where(eq(menus.ownerId, ownerId)).get();
+    await createMenu({ownerId,slug:`menu-${crypto.randomUUID().replaceAll("-", "").slice(0,16)}`,draft:JSON.stringify(DEFAULT_MENU),published:null,updatedAt:new Date().toISOString(),publishedAt:null});
+    row=await findMenu(ownerId);
   }
   if (!row) throw new Error("Unable to create menu");
   return row;
 }
 
-export function menuResponse(row: typeof menus.$inferSelect) {
+export function menuResponse(row: MenuRow) {
   return { menu: normalizeMenu(JSON.parse(row.draft) as Menu), slug: row.slug, published: Boolean(row.published), updatedAt: row.updatedAt };
 }
 
@@ -115,7 +112,7 @@ export async function validateMenu(value: unknown, ownerId: string): Promise<Men
     if (typeof p.enabled !== "boolean") throw new ApiError(400, "Please check promotion availability.");
     const allowedDays = new Set(["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]);
     if (!Array.isArray(p.days) || p.days.length > 7 || p.days.some(day => typeof day !== "string" || !allowedDays.has(day)) || new Set(p.days).size !== p.days.length) throw new ApiError(400, "Choose valid, different promotion days.");
-    promotion = { enabled: p.enabled, title: textValue(p.title, "promotion title", 100, p.enabled), description: textValue(p.description, "promotion description", 500), days: p.days as Menu["promotion"]["days"], image: await validatePhoto(p.image ?? "", ownerId), afterCategory: textValue(p.afterCategory ?? "", "banner position", 80) };
+    promotion = { enabled: p.enabled, title: textValue(p.title, "promotion title", 100, p.enabled), description: textValue(p.description, "promotion description", 500), days: p.days as Menu["promotion"]["days"], image: await validatePhoto(p.image ?? "", ownerId), afterCategory: textValue(p.afterCategory ?? "", "banner position", 80), includedDishes: validateOfferItems(p.includedDishes, seen) };
   }
   const rawEvents = raw.events === undefined ? [] : raw.events;
   if (!Array.isArray(rawEvents) || rawEvents.length > 12) throw new ApiError(400, "Add up to 12 events to your menu.");
@@ -142,7 +139,7 @@ export async function validateMenu(value: unknown, ownerId: string): Promise<Men
     const timezone = textValue(event.timezone, "event timezone", 80, true);
     try { new Intl.DateTimeFormat("en", { timeZone: timezone }).format(); }
     catch { throw new ApiError(400, "Choose a valid event timezone."); }
-    return { id, title: textValue(event.title, "event title", 100, event.enabled), description: textValue(event.description, "event description", 1000), enabled: event.enabled, recurrence: event.recurrence, days: event.days as Weekday[], date, startTime, endTime, timezone, image: await validatePhoto(event.image ?? "", ownerId), afterCategory: textValue(event.afterCategory ?? "", "event banner position", 80) };
+    return { id, title: textValue(event.title, "event title", 100, event.enabled), description: textValue(event.description, "event description", 1000), enabled: event.enabled, recurrence: event.recurrence, days: event.days as Weekday[], date, startTime, endTime, timezone, image: await validatePhoto(event.image ?? "", ownerId), afterCategory: textValue(event.afterCategory ?? "", "event banner position", 80), includedDishes: validateOfferItems(event.includedDishes, seen) };
   }));
   return { restaurantName: textValue(raw.restaurantName, "restaurant name", 150, true), tagline: textValue(raw.tagline, "tagline", 300), currency, accent, template, featuredDishIds: featured as string[], promotion, events, dishes };
 }
@@ -151,9 +148,9 @@ export async function validatePhoto(value: unknown, ownerId: string) {
   const image = textValue(value, "photo", 2048);
     if (image.startsWith("/api/images/")) {
       const imageId = image.slice("/api/images/".length);
-      const upload = await getDb().select().from(uploads).where(and(eq(uploads.id, imageId), eq(uploads.ownerId, ownerId))).get();
+      const upload = await findUpload(imageId,ownerId);
       if (!upload) throw new ApiError(400, "Please upload your own photo for this dish.");
-  } else if (image.startsWith("/images/") && DEFAULT_MENU.dishes.some(dish => dish.image === image)) {
+  } else if (image.startsWith("/images/") && (DEFAULT_MENU.dishes.some(dish => dish.image === image) || DEFAULT_MENU.events.some(event => event.image === image))) {
       // Bundled illustrative demo asset; arbitrary local paths are not accepted.
   } else if (image) {
       let url: URL;
@@ -166,4 +163,16 @@ export async function validatePhoto(value: unknown, ownerId: string) {
 // Recipes and estimation notes remain in the restaurant workspace.
 export function publicMenu(menu: Menu): Menu {
   return { ...menu, dishes: menu.dishes.map(({recipe, recipeServings, ...dish}) => ({ ...dish, nutrition: dish.nutrition?.reviewed && dish.nutrition.visible ? {...dish.nutrition, notes: ""} : null })) };
+}
+
+function validateOfferItems(value:unknown, dishIds:Set<string>) {
+ if(value===undefined)return [];
+ if(!Array.isArray(value)||value.length>20)throw new ApiError(400,"Choose up to 20 menu items per offer.");
+ const seen=new Set<string>();
+ return value.map(v=>{
+  if(!v||typeof v!=="object"||typeof v.dishId!=="string"||!dishIds.has(v.dishId)||seen.has(v.dishId))throw new ApiError(400,"Choose different, existing dishes for this offer.");
+  seen.add(v.dishId);
+  if(v.price!==null&&(typeof v.price!=="number"||!Number.isFinite(v.price)||v.price<0||v.price>100000))throw new ApiError(400,"Enter a valid offer price, or leave it blank to use the menu price.");
+  return {dishId:v.dishId,price:v.price===null?null:Math.round(v.price*100)/100,note:textValue(v.note??"","offer item note",200)};
+ });
 }

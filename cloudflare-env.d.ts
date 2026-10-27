@@ -5,5 +5,10 @@ declare namespace Cloudflare {
     OPENAI_API_KEY?: string;
     OPENAI_MODEL?: string;
     OPENAI_TRANSCRIBE_MODEL?: string;
+    DATABASE_PROVIDER?: string;
+    SUPABASE_URL?: string;
+    SUPABASE_PUBLISHABLE_KEY?: string;
+    SUPABASE_SECRET_KEY?: string;
+    SUPABASE_JWKS_URL?: string;
   }
 }

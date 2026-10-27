@@ -72,3 +72,17 @@ AI calls have persistent atomic daily quotas: 20 attempts per account and 100 ac
 The selected repository is `https://github.com/AngelinaN8/Plate-digital-menu`. Sites remains the deployment source. GitHub is a source copy; pushing to GitHub alone does not redeploy Sites. Customer menus remain in D1 and uploads in R2, not GitHub. The repository’s selected audience is public, so ignored local env files, local databases and service credentials must remain excluded.
 
 Rosé banner photograph: Harrison Chang / Unsplash, https://unsplash.com/photos/a-glass-of-rose-on-a-white-table-5V_qyT4Jv5k. Illustrative event imagery, not a photographed restaurant offer.
+
+## Supabase handover in progress
+
+Target project: `https://vdlfdfsufkgvqshwleoh.supabase.co`. The official `@supabase/server` package is pinned at 1.9.2. The server adapter is in `db/store.ts`, using its `createAdminClient` helper for HTTPS Data API calls; ChatGPT identity remains the authorisation boundary and every owner operation filters by account ID. Customer identity is not silently replaced with a Supabase user UUID.
+
+The current live database remains D1 until remote schema, data migration, credentials and isolated-account checks are verified. `DATABASE_PROVIDER=supabase` explicitly switches the application to Supabase and requires `SUPABASE_SECRET_KEY`; it does not silently fall back after a Supabase failure. Public URL/publishable/JWKS values are configured, and MCP OAuth sign-in completed, but remote database tools must be loaded into the chat before applying the proposal in `database/supabase-schema-draft.sql`. This file is a schema draft, not an applied migration.
+
+Before switching: inspect existing Supabase tables; apply/review the namespaced schema using the connected tools; export D1 menu/upload/metrics/AI-use records privately; import into their `plate_*` tables, preserving owner IDs, slugs, object keys and counters; verify row counts and both snapshots; configure the server secret; test anonymous denial and own-account reads/writes; run advisors. Keep the original D1 records as a recovery copy until the handover is confirmed. Photos can continue to live in R2; their metadata moves with the structured database. Never commit the private export or a Supabase secret key.
+
+## Offer browsing
+
+The sample uses The Terrace, with “A little Mediterranean. A little unexpected.” Top-of-menu offers are a native swipe carousel with a 20-second rotation, arrows, dots and pause. Rotation stops on hover/focus, while a detail is open, on hidden pages and for reduced-motion preferences. Offers link to actual dish IDs, support menu prices or an explicit offer price (zero displays Free), and keep eligibility/timing notes visible. Menu item removal removes offer references. Sample wine is AED 30 normally and free only within the stated Wednesday ladies’ offer; tuna items retain menu prices.
+
+Real tuna-cutting photograph: ウィ貴公子, “202408031137 DSCN1854.jpg”, Wikimedia Commons, https://commons.wikimedia.org/wiki/File:202408031137_DSCN1854.jpg, CC BY-SA 4.0 https://creativecommons.org/licenses/by-sa/4.0. The asset itself is retained as downloaded; responsive display crops are labelled and share the same licence. Attribution appears with the banner and offer details. It depicts a real demonstration, not an event at the fictional sample restaurant.

@@ -1,6 +1,4 @@
-import { eq } from "drizzle-orm";
-import { getDb } from "@/db";
-import { menus } from "@/db/schema";
+import {updateMenu} from "@/db/store";
 import { owner, checkOrigin, getOwnMenu, menuResponse, validateMenu, failure, json, ApiError, readLimitedBody } from "@/lib/menu-server";
 
 export const dynamic = "force-dynamic";
@@ -19,7 +17,7 @@ export async function PUT(request: Request) {
     if (!body || typeof body !== "object") throw new ApiError(400, "A menu is required.");
     const menu = await validateMenu(body.menu, ownerId);
     await getOwnMenu(ownerId);
-    await getDb().update(menus).set({ draft: JSON.stringify(menu), updatedAt: new Date().toISOString() }).where(eq(menus.ownerId, ownerId));
+    await updateMenu(ownerId,{draft:JSON.stringify(menu),updatedAt:new Date().toISOString()});
     return json(menuResponse(await getOwnMenu(ownerId)));
   } catch (error) { return failure(error); }
 }

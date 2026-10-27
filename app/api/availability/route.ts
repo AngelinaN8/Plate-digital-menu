@@ -1,6 +1,4 @@
-import { and, eq, isNull } from "drizzle-orm";
-import { getDb } from "@/db";
-import { menus } from "@/db/schema";
+import {updateMenu} from "@/db/store";
 import { ApiError, checkOrigin, failure, getOwnMenu, json, menuResponse, owner, readLimitedBody } from "@/lib/menu-server";
 import type { Menu } from "@/lib/menu-types";
 
@@ -34,7 +32,7 @@ export async function POST(request: Request) {
       const now = new Date().toISOString();
       // Compare both JSON snapshots before writing so a concurrent save or
       // publish cannot be silently overwritten by this narrow update.
-      const updated = await getDb().update(menus).set({ draft: JSON.stringify(draft), published, updatedAt: now, publishedAt: publishedChanged ? now : row.publishedAt }).where(and(eq(menus.ownerId, ownerId), eq(menus.draft, row.draft), row.published === null ? isNull(menus.published) : eq(menus.published, row.published))).returning().get();
+      const updated = await updateMenu(ownerId,{draft:JSON.stringify(draft),published,updatedAt:now,publishedAt:publishedChanged?now:row.publishedAt},{draft:row.draft,published:row.published});
       if (updated) return json({ ...menuResponse(updated), publishedChanged });
     }
     throw new ApiError(409, "Your menu changed while updating availability. Please try again.");
