@@ -15,13 +15,29 @@ function result<T>(r:{data:T;error:unknown}):T{if(r.error)throw new Error('The d
 const menuRow=(r:PgMenu):MenuRow=>({ownerId:r.owner_id,slug:r.slug,draft:JSON.stringify(r.draft),published:r.published===null?null:JSON.stringify(r.published),updatedAt:r.updated_at,publishedAt:r.published_at});
 const pgMenu=(r:Partial<MenuRow>)=>Object.fromEntries(Object.entries(r).map(([k,v])=>[({ownerId:'owner_id',updatedAt:'updated_at',publishedAt:'published_at'} as Record<string,string>)[k]||k,(k==='draft'||k==='published')&&typeof v==='string'?JSON.parse(v):v]));
 
+async function importLegacy(ownerId?:string,slug?:string){
+ const db=getDb();const legacy=await db.select().from(menus).where(ownerId?eq(menus.ownerId,ownerId):eq(menus.slug,slug!)).get();
+ if(!legacy)return;
+ const oldUploads=await db.select().from(uploads).where(eq(uploads.ownerId,legacy.ownerId));
+ const oldMetrics=await db.select().from(menuMetrics).where(eq(menuMetrics.slug,legacy.slug));
+ const oldUsage=await db.select().from(aiUsage);
+ const snapshot={menu:legacy,uploads:oldUploads,metrics:oldMetrics,usage:oldUsage};
+ if(!env.BUCKET)throw new Error('Recovery storage unavailable; migration paused.');
+ await env.BUCKET.put('recovery/d1/'+legacy.slug+'/'+crypto.randomUUID()+'.json',JSON.stringify(snapshot),{httpMetadata:{contentType:'application/json'}});
+ result(await supabase().rpc('plate_import_legacy',{
+  p_menu:pgMenu(legacy),
+  p_uploads:oldUploads.map(r=>({id:r.id,owner_id:r.ownerId,object_key:r.objectKey,mime:r.mime,rights_confirmed_at:r.rightsConfirmedAt,rights_source:r.rightsSource,created_at:r.createdAt})),
+  p_metrics:oldMetrics.map(r=>({key:r.key,slug:r.slug,day:r.day,kind:r.kind,dish_id:r.dishId,count:r.count})),
+  p_usage:oldUsage
+ }));
+}
 export async function findMenu(ownerId:string):Promise<MenuRow|undefined>{
  if(databaseProvider()!=='supabase')return getDb().select().from(menus).where(eq(menus.ownerId,ownerId)).get();
- const r=result(await supabase().from('plate_menus').select('*').eq('owner_id',ownerId).maybeSingle()) as PgMenu|null;return r?menuRow(r):undefined;
+ let r=result(await supabase().from('plate_menus').select('*').eq('owner_id',ownerId).maybeSingle()) as PgMenu|null;if(!r){await importLegacy(ownerId);r=result(await supabase().from('plate_menus').select('*').eq('owner_id',ownerId).maybeSingle()) as PgMenu|null;}return r?menuRow(r):undefined;
 }
 export async function findPublishedMenu(slug:string):Promise<MenuRow|undefined>{
  if(databaseProvider()!=='supabase')return getDb().select().from(menus).where(eq(menus.slug,slug)).get();
- const r=result(await supabase().from('plate_menus').select('*').eq('slug',slug).maybeSingle()) as PgMenu|null;return r?menuRow(r):undefined;
+ let r=result(await supabase().from('plate_menus').select('*').eq('slug',slug).maybeSingle()) as PgMenu|null;if(!r){await importLegacy(undefined,slug);r=result(await supabase().from('plate_menus').select('*').eq('slug',slug).maybeSingle()) as PgMenu|null;}return r?menuRow(r):undefined;
 }
 export async function createMenu(row:MenuRow){
  if(databaseProvider()!=='supabase'){await getDb().insert(menus).values(row).onConflictDoNothing();return;}
@@ -38,7 +54,7 @@ export async function updateMenu(ownerId:string,patch:Partial<MenuRow>,expected?
 export async function findUpload(id:string,ownerId?:string):Promise<UploadRow|undefined>{
  if(databaseProvider()!=='supabase')return getDb().select().from(uploads).where(ownerId?and(eq(uploads.id,id),eq(uploads.ownerId,ownerId)):eq(uploads.id,id)).get();
  let q=supabase().from('plate_uploads').select('*').eq('id',id);if(ownerId)q=q.eq('owner_id',ownerId);
- const r=result(await q.maybeSingle()) as {id:string;owner_id:string;object_key:string;mime:string;rights_confirmed_at:string;rights_source:string;created_at:string}|null;
+ let r=result(await q.maybeSingle()) as {id:string;owner_id:string;object_key:string;mime:string;rights_confirmed_at:string;rights_source:string;created_at:string}|null;if(!r){const legacy=await getDb().select().from(uploads).where(ownerId?and(eq(uploads.id,id),eq(uploads.ownerId,ownerId)):eq(uploads.id,id)).get();if(legacy){await importLegacy(legacy.ownerId);r=result(await supabase().from('plate_uploads').select('*').eq('id',id).maybeSingle()) as typeof r;}}
  return r?{id:r.id,ownerId:r.owner_id,objectKey:r.object_key,mime:r.mime,rightsConfirmedAt:r.rights_confirmed_at,rightsSource:r.rights_source,createdAt:r.created_at}:undefined;
 }
 export async function createUpload(row:UploadRow){

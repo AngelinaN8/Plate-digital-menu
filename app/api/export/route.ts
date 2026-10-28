@@ -9,7 +9,7 @@ const escape=(value:unknown)=>String(value??'').replaceAll('&','&amp;').replaceA
 export async function GET(request:Request){
  try{
   const ownerId=await owner();const row=await getOwnMenu(ownerId);const menu=normalizeMenu(JSON.parse(row.draft));
-  if(menu.dishes.length>40)throw new ApiError(400,'The one-time menu export supports up to 40 dishes. Download your full JSON backup from Style & details.');
+  if(menu.dishes.length>40)throw new ApiError(400,'The HTML backup supports up to 40 dishes. Download your full JSON backup from Style & details.');
   const images=new Map<string,string>();let total=0;
   const image=async(path:string|undefined)=>{
    if(!path)return '';if(images.has(path))return images.get(path)!;

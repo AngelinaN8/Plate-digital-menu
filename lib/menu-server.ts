@@ -1,7 +1,9 @@
 import {findMenu,createMenu,findUpload,type MenuRow} from "@/db/store";
 import { getChatGPTUser } from "@/app/chatgpt-auth";
+import {getPlateUser} from "./supabase-auth";
 import { DEFAULT_MENU, normalizeMenu, type Menu, type Dish, type MenuEvent, type Weekday } from "./menu-types";
 
+import {translationFields,translationSource,LANGUAGES,usableTranslations} from "./menu-languages";
 import { parseNutrition } from "./nutrition";
 
 export class ApiError extends Error {
@@ -9,7 +11,7 @@ export class ApiError extends Error {
 }
 
 export async function owner() {
-  const user = await getChatGPTUser();
+  const user = await getPlateUser() || await getChatGPTUser();
   if (!user) throw new ApiError(401, "Sign in to manage your menu.");
   return user.userId;
 }
@@ -141,7 +143,15 @@ export async function validateMenu(value: unknown, ownerId: string): Promise<Men
     catch { throw new ApiError(400, "Choose a valid event timezone."); }
     return { id, title: textValue(event.title, "event title", 100, event.enabled), description: textValue(event.description, "event description", 1000), enabled: event.enabled, recurrence: event.recurrence, days: event.days as Weekday[], date, startTime, endTime, timezone, image: await validatePhoto(event.image ?? "", ownerId), afterCategory: textValue(event.afterCategory ?? "", "event banner position", 80), includedDishes: validateOfferItems(event.includedDishes, seen) };
   }));
-  return { restaurantName: textValue(raw.restaurantName, "restaurant name", 150, true), tagline: textValue(raw.tagline, "tagline", 300), currency, accent, template, featuredDishIds: featured as string[], promotion, events, dishes };
+  const languagePlan=raw.languagePlan==='core'?'core':'pro';
+  const translations=raw.translations??[];
+  if(!Array.isArray(translations)||translations.length>(languagePlan==='core'?1:6))throw new ApiError(400,'Core supports 2 total languages; Pro supports up to 7.');
+  const langSeen=new Set<string>();
+  const checkedTranslations=translations.map(t=>{if(!t||!LANGUAGES.some(l=>l.code===t.code&&l.code!=='en')||langSeen.has(t.code)||typeof t.reviewed!=='boolean'||typeof t.sourceText!=='string'||t.sourceText.length>500000||!t.values||typeof t.values!=='object'||Array.isArray(t.values))throw new ApiError(400,'Please check menu languages.');langSeen.add(t.code);const values:Record<string,string>={};for(const [k,v]of Object.entries(t.values)){if(k.length>200||typeof v!=='string'||v.length>6000)throw new ApiError(400,'Please check translated wording.');values[k]=v}return {code:t.code,reviewed:t.reviewed,sourceText:t.sourceText,values}});
+  const baseForTranslation={restaurantName:raw.restaurantName,tagline:raw.tagline,currency,accent,template,featuredDishIds:featured,promotion,events,dishes} as Menu;
+  const requiredTranslationKeys=Object.keys(translationFields(baseForTranslation));
+  for(const t of checkedTranslations){if(t.reviewed&&(t.sourceText!==translationSource(baseForTranslation)||requiredTranslationKeys.some(k=>typeof t.values[k]!=='string'||(translationFields(baseForTranslation)[k]&&!t.values[k].trim()))))t.reviewed=false;}
+  return {languagePlan,translations:checkedTranslations, restaurantName: textValue(raw.restaurantName, "restaurant name", 150, true), tagline: textValue(raw.tagline, "tagline", 300), currency, accent, template, featuredDishIds: featured as string[], promotion, events, dishes };
 }
 
 export async function validatePhoto(value: unknown, ownerId: string) {
@@ -162,7 +172,7 @@ export async function validatePhoto(value: unknown, ownerId: string) {
 
 // Recipes and estimation notes remain in the restaurant workspace.
 export function publicMenu(menu: Menu): Menu {
-  return { ...menu, dishes: menu.dishes.map(({recipe, recipeServings, ...dish}) => ({ ...dish, nutrition: dish.nutrition?.reviewed && dish.nutrition.visible ? {...dish.nutrition, notes: ""} : null })) };
+  return { ...menu, translations:usableTranslations(menu), dishes: menu.dishes.map(({recipe, recipeServings, ...dish}) => ({ ...dish, nutrition: dish.nutrition?.reviewed && dish.nutrition.visible ? {...dish.nutrition, notes: ""} : null })) };
 }
 
 function validateOfferItems(value:unknown, dishIds:Set<string>) {

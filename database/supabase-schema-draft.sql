@@ -1,4 +1,4 @@
--- Plate Supabase schema proposal. Not yet applied to the remote project.
+-- Plate Supabase schema snapshot. Applied through the Supabase migration tool.
 -- Application access is through the authenticated Plate backend only.
 -- No anonymous/authenticated Data API table grants or permissive RLS policies.
 begin;

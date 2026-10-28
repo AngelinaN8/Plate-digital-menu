@@ -1,3 +1,4 @@
+import type {MenuTranslation} from './menu-languages';
 export type Nutrition = {
   energyKcal: number;
   proteinG: number;
@@ -45,6 +46,8 @@ export type MenuEvent = {
 };
 
 export type Menu = {
+  languagePlan?: "core" | "pro";
+  translations?: MenuTranslation[];
   restaurantName: string;
   tagline: string;
   currency: string;
@@ -68,6 +71,8 @@ export function normalizeMenu(menu: Menu): Menu {
   return {
     ...menu,
     template: menu.template ?? "editorial",
+    languagePlan: menu.languagePlan ?? "pro",
+    translations: menu.translations ?? [],
     featuredDishIds: menu.featuredDishIds ?? [],
     dishes: menu.dishes.map(d => ({ ...d, nutrition: d.nutrition ?? null, recipe: d.recipe ?? "", recipeServings: d.recipeServings ?? 1 })),
     events: menu.events ?? [],
@@ -83,7 +88,7 @@ export function normalizeMenu(menu: Menu): Menu {
   };
 }
 
-// Illustrative sample content. These photographs and generated concept images do not verify a real dish.
+// Illustrative sample content. Licensed real photographs illustrate a fictional restaurant and do not verify its recipes.
 export const DEFAULT_MENU: Menu = {
   restaurantName: "The Terrace",
   tagline: "A little Mediterranean. A little unexpected.",
@@ -138,9 +143,9 @@ export const DEFAULT_MENU: Menu = {
       id: "steak-rossini", name: "Steak Rossini", category: "Mains", price: 268,
       description: "Beef fillet, seared foie gras, black truffle and Madeira jus.",
       portion: "Main · example portion · serves one",
-      preparation: "Whole beef fillet on brioche, topped with seared foie gras and truffle, with a small potato purée quenelle.",
+      preparation: "Beef fillet topped with foie gras and shaved truffle, with Madeira sauce and vegetables.",
       allergens: ["Milk", "Wheat", "Sulphites"],
-      image: "/images/steak-rossini-concept.webp",
+      image: "/images/steak-rossini-real.jpg",
       available: true,
     },
     {
@@ -150,16 +155,16 @@ export const DEFAULT_MENU: Menu = {
       allergens: ["Sulphites"], image: "https://images.unsplash.com/photo-1747445666097-79d068882681?auto=format&fit=crop&w=1200&q=85", available: true,
     },
     {
-      id: "tuna-steak", name: "Tuna steak", category: "Mains", price: 148,
+      id: "tuna-steak", name: "Sesame-seared tuna steak", category: "Mains", price: 148,
       description: "Seared tuna, sesame, citrus and seasonal greens.", portion: "Main · example portion · serves one",
-      preparation: "A whole tuna steak, lightly seared with a pink centre. Ask your server about cooking preferences.",
-      allergens: ["Fish", "Sesame", "Soy"], image: "", available: true,
+      preparation: "Sesame-crusted tuna steak, seared outside with a pink centre, sliced and served with wasabi-lime dressing.",
+      allergens: ["Fish", "Sesame", "Soy", "Tree nuts"], image: "/images/tuna-steak-real.jpg", available: true,
     },
     {
       id: "tuna-sashimi", name: "Tuna sashimi", category: "Starters", price: 98,
-      description: "Fresh tuna slices with ponzu, wasabi and pickled ginger.", portion: "Six slices · example serving",
-      preparation: "Sliced raw tuna, served chilled with condiments alongside.",
-      allergens: ["Fish", "Soy", "Wheat"], image: "", available: true,
+      description: "Fresh tuna slices with soy sauce and wasabi.", portion: "Starter · example serving",
+      preparation: "Sliced raw tuna, served chilled with shredded daikon and condiments alongside.",
+      allergens: ["Fish", "Soy", "Wheat"], image: "/images/tuna-sashimi-real.jpg", available: true,
     },
     {
       id: "tuna-ceviche", name: "Tuna ceviche", category: "Starters", price: 92,
