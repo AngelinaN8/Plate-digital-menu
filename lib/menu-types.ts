@@ -11,6 +11,7 @@ export type Nutrition = {
 };
 
 export type Dish = {
+  marketPrice?: boolean;
   moodTags?: import("./dish-moods").MoodTags;
   id: string;
   name: string;
@@ -47,6 +48,7 @@ export type MenuEvent = {
 };
 
 export type Menu = {
+  reference?: {website:string;pdf:string;notice:string;feeNote:string;checkedAt:string};
   headingStyle?: "sans" | "serif";
   languagePlan?: "core" | "pro";
   translations?: MenuTranslation[];

@@ -95,7 +95,7 @@ export async function validateMenu(value: unknown, ownerId: string): Promise<Men
     seen.add(id);
     if (typeof d.available !== "boolean") throw new ApiError(400, "Please check dish availability.");
     if (d.price !== null && (typeof d.price !== "number" || !Number.isFinite(d.price) || d.price < 0 || d.price > 100000)) throw new ApiError(400, "Please enter a valid dish price.");
-    if (d.price === null && d.available) throw new ApiError(400, "Add a price before making this dish available.");
+    if (d.price === null && d.available && d.marketPrice !== true) throw new ApiError(400, "Add a price before making this dish available.");
     if (!Array.isArray(d.allergens) || d.allergens.length > 20) throw new ApiError(400, "Please check allergens.");
     const image = await validatePhoto(d.image, ownerId);
     let nutrition;
@@ -103,7 +103,7 @@ export async function validateMenu(value: unknown, ownerId: string): Promise<Men
     const recipe = d.recipe === undefined ? "" : textValue(d.recipe, "recipe", 5000);
     const recipeServings = d.recipeServings === undefined ? 1 : d.recipeServings;
     if (typeof recipeServings !== "number" || !Number.isFinite(recipeServings) || recipeServings < 1 || recipeServings > 1000) throw new ApiError(400, "Enter the number of servings in this recipe.");
-    const dish: Dish = { id, name: textValue(d.name, "dish name", 150, true), category: textValue(d.category, "category", 80, true), price: d.price === null ? null : Math.round((d.price as number) * 100) / 100, description: textValue(d.description, "description", 1500), portion: textValue(d.portion, "portion", 200), preparation: textValue(d.preparation, "preparation", 500), allergens: d.allergens.map(a => textValue(a, "allergen", 60, true)), image, available: d.available, nutrition, recipe, recipeServings };
+    const dish: Dish = { marketPrice:d.marketPrice===true, id, name: textValue(d.name, "dish name", 150, true), category: textValue(d.category, "category", 80, true), price: d.price === null ? null : Math.round((d.price as number) * 100) / 100, description: textValue(d.description, "description", 1500), portion: textValue(d.portion, "portion", 200), preparation: textValue(d.preparation, "preparation", 500), allergens: d.allergens.map(a => textValue(a, "allergen", 60, true)), image, available: d.available, nutrition, recipe, recipeServings };
     if(d.moodTags!==undefined){const m=d.moodTags as MoodTags;if(!m||!Array.isArray(m.values)||m.values.length>3||new Set(m.values).size!==m.values.length||m.values.some(t=>!MOODS.includes(t))||typeof m.reviewed!=="boolean"||typeof m.sourceHash!=="string"||m.sourceHash.length>100)throw new ApiError(400,"Please check dish flavour tags.");dish.moodTags={values:m.values,reviewed:m.reviewed&&m.sourceHash===await moodHash(dish),sourceHash:m.sourceHash};}
     dishes.push(dish);
   }
@@ -155,7 +155,9 @@ export async function validateMenu(value: unknown, ownerId: string): Promise<Men
   const baseForTranslation={restaurantName:raw.restaurantName,tagline:raw.tagline,currency,accent,template,featuredDishIds:featured,promotion,events,dishes} as Menu;
   const requiredTranslationKeys=Object.keys(translationFields(baseForTranslation));
   for(const t of checkedTranslations){if(t.reviewed&&(t.sourceText!==translationSource(baseForTranslation)||requiredTranslationKeys.some(k=>typeof t.values[k]!=='string'||(translationFields(baseForTranslation)[k]&&!t.values[k].trim()))))t.reviewed=false;}
-  return {headingStyle,languagePlan,translations:checkedTranslations, restaurantName: textValue(raw.restaurantName, "restaurant name", 150, true), tagline: textValue(raw.tagline, "tagline", 300), currency, accent, template, featuredDishIds: featured as string[], promotion, events, dishes };
+  let reference:Menu["reference"];
+  if(raw.reference!==undefined){const r=raw.reference as Record<string,unknown>;if(!r||typeof r!=="object")throw new ApiError(400,"Check menu source details.");const website=textValue(r.website,"source website",2048,true),pdf=textValue(r.pdf,"source menu",2048,true);for(const x of [website,pdf]){let u;try{u=new URL(x)}catch{throw new ApiError(400,"Use HTTPS source links.")}if(u.protocol!=="https:"||u.username||u.password)throw new ApiError(400,"Use HTTPS source links.");}reference={website,pdf,notice:textValue(r.notice,"source notice",500),feeNote:textValue(r.feeNote,"source fee note",700),checkedAt:textValue(r.checkedAt,"source date",20)};}
+  return {reference,headingStyle,languagePlan,translations:checkedTranslations, restaurantName: textValue(raw.restaurantName, "restaurant name", 150, true), tagline: textValue(raw.tagline, "tagline", 300), currency, accent, template, featuredDishIds: featured as string[], promotion, events, dishes };
 }
 
 export async function validatePhoto(value: unknown, ownerId: string) {
