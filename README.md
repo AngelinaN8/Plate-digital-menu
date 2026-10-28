@@ -60,3 +60,8 @@ Tuna sashimi — sunday driver, https://commons.wikimedia.org/wiki/File:Tuna_sas
 Tuna cutting — ウィ貴公子, https://commons.wikimedia.org/wiki/File:202408031137_DSCN1854.jpg, CC BY-SA4.0 https://creativecommons.org/licenses/by-sa/4.0/. Source photo retained; responsive display crops labelled. Real demonstration, not an event at the fictional restaurant.
 
 Other real sample photography via Unsplash. Rosé — Harrison Chang, https://unsplash.com/photos/a-glass-of-rose-on-a-white-table-5V_qyT4Jv5k. All source photos are illustrative; restaurants must upload actual dish photos with suitable rights.
+
+
+## Research and owner business case
+
+The homepage now uses the owner-facing hook “Make guests crave what you serve”, without the old channel-list sticker. Hero framing centres the real Rossini photograph. `/why-photos` adds cited UAE discovery research, separately labelled delivery-platform figures, the limits of purchase-intention evidence, an honest-expectations rationale and a proposed restaurant pilot. These are third-party findings, not Plate results. A browser-local break-even calculator uses contribution after variable costs; defaults are examples, not a sales forecast. Zero contribution never produces a false payback. No new personal data is collected.
