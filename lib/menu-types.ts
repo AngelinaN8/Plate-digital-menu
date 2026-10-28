@@ -11,6 +11,7 @@ export type Nutrition = {
 };
 
 export type Dish = {
+  moodTags?: import("./dish-moods").MoodTags;
   id: string;
   name: string;
   category: string;

@@ -1,0 +1,60 @@
+{
+  "garden-salad": {
+    "values": [
+      "Fresh",
+      "Light"
+    ],
+    "reviewed": true,
+    "sourceHash": "60b4d89cbb9bd83a1bbd06b76dbd8126eafaeb91a13ab36a385b8f024cf8f5cb"
+  },
+  "tomato-pasta": {
+    "values": [
+      "Comforting"
+    ],
+    "reviewed": true,
+    "sourceHash": "ed1c6b92b6c91f4cea8d55ec157594f71a7b768782654017653d00af1e9c8680"
+  },
+  "steak-rossini": {
+    "values": [
+      "Rich"
+    ],
+    "reviewed": true,
+    "sourceHash": "0a65074d825fb534dc06b1c21cd8e0e24d3c68994b63f2a28004f15e1c090bd6"
+  },
+  "whispering-angel": {
+    "values": [
+      "Fresh"
+    ],
+    "reviewed": true,
+    "sourceHash": "7d6cd29616c850314d84e30256fd43044a1ab0bce499dd7250f96d8bec0123c7"
+  },
+  "tuna-steak": {
+    "values": [
+      "Rich"
+    ],
+    "reviewed": true,
+    "sourceHash": "c88d845bafdda8f108aace59886bee2bd2544c5109e602e257d8cd2ad5c33a8b"
+  },
+  "tuna-sashimi": {
+    "values": [
+      "Light"
+    ],
+    "reviewed": true,
+    "sourceHash": "42e52138f6d0a01d8e32370b85e7ce542b919d684fff3624d4511fc77a116912"
+  },
+  "tuna-ceviche": {
+    "values": [
+      "Fresh",
+      "Light"
+    ],
+    "reviewed": true,
+    "sourceHash": "e6d1c240fcdf7843f17ce8692d94a75fa6c6978dabd11f5f9b379915a8938da5"
+  },
+  "house-cocktail": {
+    "values": [
+      "Rich"
+    ],
+    "reviewed": true,
+    "sourceHash": "a89c0cf9fc08896b5f05f29b2c68b59a64c33a7737b833e45db568f4eeed24bb"
+  }
+}

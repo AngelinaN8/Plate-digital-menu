@@ -4,6 +4,7 @@ import {getPlateUser} from "./supabase-auth";
 import { DEFAULT_MENU, normalizeMenu, type Menu, type Dish, type MenuEvent, type Weekday } from "./menu-types";
 
 import {translationFields,translationSource,LANGUAGES,usableTranslations} from "./menu-languages";
+import {MOODS,moodHash,type MoodTags} from "./dish-moods";
 import { parseNutrition } from "./nutrition";
 
 export class ApiError extends Error {
@@ -102,7 +103,9 @@ export async function validateMenu(value: unknown, ownerId: string): Promise<Men
     const recipe = d.recipe === undefined ? "" : textValue(d.recipe, "recipe", 5000);
     const recipeServings = d.recipeServings === undefined ? 1 : d.recipeServings;
     if (typeof recipeServings !== "number" || !Number.isFinite(recipeServings) || recipeServings < 1 || recipeServings > 1000) throw new ApiError(400, "Enter the number of servings in this recipe.");
-    dishes.push({ id, name: textValue(d.name, "dish name", 150, true), category: textValue(d.category, "category", 80, true), price: d.price === null ? null : Math.round((d.price as number) * 100) / 100, description: textValue(d.description, "description", 1500), portion: textValue(d.portion, "portion", 200), preparation: textValue(d.preparation, "preparation", 500), allergens: d.allergens.map(a => textValue(a, "allergen", 60, true)), image, available: d.available, nutrition, recipe, recipeServings });
+    const dish: Dish = { id, name: textValue(d.name, "dish name", 150, true), category: textValue(d.category, "category", 80, true), price: d.price === null ? null : Math.round((d.price as number) * 100) / 100, description: textValue(d.description, "description", 1500), portion: textValue(d.portion, "portion", 200), preparation: textValue(d.preparation, "preparation", 500), allergens: d.allergens.map(a => textValue(a, "allergen", 60, true)), image, available: d.available, nutrition, recipe, recipeServings };
+    if(d.moodTags!==undefined){const m=d.moodTags as MoodTags;if(!m||!Array.isArray(m.values)||m.values.length>3||new Set(m.values).size!==m.values.length||m.values.some(t=>!MOODS.includes(t))||typeof m.reviewed!=="boolean"||typeof m.sourceHash!=="string"||m.sourceHash.length>100)throw new ApiError(400,"Please check dish flavour tags.");dish.moodTags={values:m.values,reviewed:m.reviewed&&m.sourceHash===await moodHash(dish),sourceHash:m.sourceHash};}
+    dishes.push(dish);
   }
   const template = raw.template === undefined ? "editorial" : raw.template;
   if (template !== "editorial" && template !== "gallery" && template !== "classic") throw new ApiError(400, "Choose a valid menu template.");
@@ -146,7 +149,7 @@ export async function validateMenu(value: unknown, ownerId: string): Promise<Men
   }));
   const languagePlan=raw.languagePlan==='core'?'core':'pro';
   const translations=raw.translations??[];
-  if(!Array.isArray(translations)||translations.length>(languagePlan==='core'?1:6))throw new ApiError(400,'Core supports 2 total languages; Pro supports up to 7.');
+  if(!Array.isArray(translations)||translations.length>(languagePlan==='core'?1:LANGUAGES.length-1))throw new ApiError(400,'Core supports 2 total languages; Pro supports all 10 available languages.');
   const langSeen=new Set<string>();
   const checkedTranslations=translations.map(t=>{if(!t||!LANGUAGES.some(l=>l.code===t.code&&l.code!=='en')||langSeen.has(t.code)||typeof t.reviewed!=='boolean'||typeof t.sourceText!=='string'||t.sourceText.length>500000||!t.values||typeof t.values!=='object'||Array.isArray(t.values))throw new ApiError(400,'Please check menu languages.');langSeen.add(t.code);const values:Record<string,string>={};for(const [k,v]of Object.entries(t.values)){if(k.length>200||typeof v!=='string'||v.length>6000)throw new ApiError(400,'Please check translated wording.');values[k]=v}return {code:t.code,reviewed:t.reviewed,sourceText:t.sourceText,values}});
   const baseForTranslation={restaurantName:raw.restaurantName,tagline:raw.tagline,currency,accent,template,featuredDishIds:featured,promotion,events,dishes} as Menu;
@@ -173,7 +176,7 @@ export async function validatePhoto(value: unknown, ownerId: string) {
 
 // Recipes and estimation notes remain in the restaurant workspace.
 export function publicMenu(menu: Menu): Menu {
-  return { ...menu, translations:usableTranslations(menu), dishes: menu.dishes.map(({recipe, recipeServings, ...dish}) => ({ ...dish, nutrition: dish.nutrition?.reviewed && dish.nutrition.visible ? {...dish.nutrition, notes: ""} : null })) };
+  return { ...menu, translations:usableTranslations(menu), dishes: menu.dishes.map(({recipe, recipeServings, ...dish}) => ({ ...dish, moodTags:dish.moodTags?.reviewed?{...dish.moodTags,sourceHash:""}:undefined, nutrition: dish.nutrition?.reviewed && dish.nutrition.visible ? {...dish.nutrition, notes: ""} : null })) };
 }
 
 function validateOfferItems(value:unknown, dishIds:Set<string>) {
