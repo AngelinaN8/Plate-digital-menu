@@ -167,7 +167,7 @@ export async function validatePhoto(value: unknown, ownerId: string) {
       const imageId = image.slice("/api/images/".length);
       const upload = await findUpload(imageId,ownerId);
       if (!upload) throw new ApiError(400, "Please upload your own photo for this dish.");
-  } else if (image.startsWith("/images/") && (DEFAULT_MENU.dishes.some(dish => dish.image === image) || DEFAULT_MENU.events.some(event => event.image === image))) {
+  } else if (image.startsWith("/images/") && (DEFAULT_MENU.dishes.some(dish => dish.image === image) || DEFAULT_MENU.events.some(event => event.image === image) || image === "/images/tuna-cutting-licensed.jpg")) {
       // Bundled illustrative demo asset; arbitrary local paths are not accepted.
   } else if (image) {
       let url: URL;

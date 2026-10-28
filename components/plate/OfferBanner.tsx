@@ -1,6 +1,6 @@
 import {ArrowUpRight} from 'lucide-react';
 export default function OfferBanner({title,description,schedule,image,dates,onOpen,buttonTabIndex=0}:{title:string;description:string;schedule:string;image?:string;dates?:string;onOpen?:()=>void;buttonTabIndex?:number}){
- return <article className={'offer-banner '+(!image?'offer-no-photo ':'')+(image?.includes('tuna-cutting-licensed')?'tuna-banner':'')}>
+ return <article className={'offer-banner '+(!image?'offer-no-photo ':'')+(image?.includes('tuna-cutting-licensed')?'tuna-banner':image?.includes('tuna-offer-real')?'tuna-plated-banner':'')}>
   {image&&<img className="offer-photo" src={image} alt="" loading="lazy"/>}
   <div className="offer-shade"/>
   <div className="offer-banner-copy"><span className="offer-schedule">{schedule}</span><h3>{title}</h3><p>{description}</p>{dates&&<small>{dates}</small>}<span className="offer-server">{onOpen?'See what’s included':'Ask your server'} <ArrowUpRight size={14}/></span></div>
