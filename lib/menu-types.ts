@@ -11,6 +11,7 @@ export type Nutrition = {
 };
 
 export type Dish = {
+  servingStyle?: import("./serving-style").ServingStyle;
   marketPrice?: boolean;
   moodTags?: import("./dish-moods").MoodTags;
   id: string;

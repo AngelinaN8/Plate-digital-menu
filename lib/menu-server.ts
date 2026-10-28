@@ -97,13 +97,14 @@ export async function validateMenu(value: unknown, ownerId: string): Promise<Men
     if (d.price !== null && (typeof d.price !== "number" || !Number.isFinite(d.price) || d.price < 0 || d.price > 100000)) throw new ApiError(400, "Please enter a valid dish price.");
     if (d.price === null && d.available && d.marketPrice !== true) throw new ApiError(400, "Add a price before making this dish available.");
     if (!Array.isArray(d.allergens) || d.allergens.length > 20) throw new ApiError(400, "Please check allergens.");
+    if(d.servingStyle!==undefined&&!["one","sharing","unspecified"].includes(d.servingStyle as string))throw new ApiError(400,"Choose a valid serving style.");
     const image = await validatePhoto(d.image, ownerId);
     let nutrition;
     try { nutrition = parseNutrition(d.nutrition); } catch (e) { throw new ApiError(400, (e as Error).message); }
     const recipe = d.recipe === undefined ? "" : textValue(d.recipe, "recipe", 5000);
     const recipeServings = d.recipeServings === undefined ? 1 : d.recipeServings;
     if (typeof recipeServings !== "number" || !Number.isFinite(recipeServings) || recipeServings < 1 || recipeServings > 1000) throw new ApiError(400, "Enter the number of servings in this recipe.");
-    const dish: Dish = { marketPrice:d.marketPrice===true, id, name: textValue(d.name, "dish name", 150, true), category: textValue(d.category, "category", 80, true), price: d.price === null ? null : Math.round((d.price as number) * 100) / 100, description: textValue(d.description, "description", 1500), portion: textValue(d.portion, "portion", 200), preparation: textValue(d.preparation, "preparation", 500), allergens: d.allergens.map(a => textValue(a, "allergen", 60, true)), image, available: d.available, nutrition, recipe, recipeServings };
+    const dish: Dish = { servingStyle:d.servingStyle as Dish["servingStyle"], marketPrice:d.marketPrice===true, id, name: textValue(d.name, "dish name", 150, true), category: textValue(d.category, "category", 80, true), price: d.price === null ? null : Math.round((d.price as number) * 100) / 100, description: textValue(d.description, "description", 1500), portion: textValue(d.portion, "portion", 200), preparation: textValue(d.preparation, "preparation", 500), allergens: d.allergens.map(a => textValue(a, "allergen", 60, true)), image, available: d.available, nutrition, recipe, recipeServings };
     if(d.moodTags!==undefined){const m=d.moodTags as MoodTags;if(!m||!Array.isArray(m.values)||m.values.length>3||new Set(m.values).size!==m.values.length||m.values.some(t=>!MOODS.includes(t))||typeof m.reviewed!=="boolean"||typeof m.sourceHash!=="string"||m.sourceHash.length>100)throw new ApiError(400,"Please check dish flavour tags.");dish.moodTags={values:m.values,reviewed:m.reviewed&&m.sourceHash===await moodHash(dish),sourceHash:m.sourceHash};}
     dishes.push(dish);
   }
