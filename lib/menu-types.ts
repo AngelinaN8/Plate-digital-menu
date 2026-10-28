@@ -163,13 +163,13 @@ export const DEFAULT_MENU: Menu = {
       id: "tuna-steak", name: "Sesame-seared tuna steak", category: "Mains", price: 148,
       description: "Seared tuna, sesame, citrus and seasonal greens.", portion: "Main · example portion · serves one",
       preparation: "Sesame-crusted tuna steak, seared outside with a pink centre, sliced and served with wasabi-lime dressing.",
-      allergens: ["Fish", "Sesame", "Soy", "Tree nuts"], image: "/images/tuna-steak-real.jpg", available: true,
+      allergens: ["Fish", "Sesame", "Soy", "Tree nuts"], image: "/images/tuna-steak-plated.jpg", available: true,
     },
     {
       id: "tuna-sashimi", name: "Tuna sashimi", category: "Starters", price: 98,
       description: "Fresh tuna slices with soy sauce and wasabi.", portion: "Starter · example serving",
       preparation: "Sliced raw tuna, served chilled with shredded daikon and condiments alongside.",
-      allergens: ["Fish", "Soy", "Wheat"], image: "/images/tuna-sashimi-real.jpg", available: true,
+      allergens: ["Fish", "Soy", "Wheat"], image: "/images/tuna-sashimi-plated.jpg", available: true,
     },
     {
       id: "tuna-ceviche", name: "Tuna ceviche", category: "Starters", price: 92,
