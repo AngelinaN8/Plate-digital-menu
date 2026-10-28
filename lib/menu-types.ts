@@ -121,7 +121,7 @@ export const DEFAULT_MENU: Menu = {
       description: "Join us for a live tuna cutting on the last Sunday of each month. Ask the team for details.",
       enabled: true, recurrence: "last-weekday-monthly", days: ["Sun"], date: "",
       startTime: "13:00", endTime: "15:00", timezone: "Asia/Dubai",
-      image: "/images/tuna-offer-real.jpg", afterCategory: "__top",
+      image: "/images/tuna-cutting-licensed.jpg", afterCategory: "__top",
       includedDishes: [{dishId:"tuna-steak",price:null,note:"Fresh from the live cutting · menu price applies"},{dishId:"tuna-sashimi",price:null,note:"Sliced to order · menu price applies"},{dishId:"tuna-ceviche",price:null,note:"Citrus-cured · menu price applies"}],
     },
   ],
@@ -141,7 +141,7 @@ export const DEFAULT_MENU: Menu = {
       portion: "Starter · 220 g · serves one",
       preparation: "Spiral pasta tossed in tomato sauce and finished with fresh herbs. Served hot.",
       allergens: ["Wheat"],
-      image: "https://images.unsplash.com/photo-1608897013039-887f21d8c804?auto=format&fit=crop&w=1200&q=85",
+      image: "/images/tomato-fusilli-plated.jpg",
       available: true,
     },
     {
