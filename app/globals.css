@@ -178,3 +178,6 @@ h1,h2,h3,.floating-dish strong,.statement-inner>p,.plan h3,.dish-name-row h3,.qr
 
 /* Keep the plated fusilli in frame and the live cutting visible in the compact offer. */
 img[src="/images/tomato-fusilli-plated.jpg"]{object-position:50% 68%}.terrace-sample .offer-carousel .tuna-banner .offer-photo{width:70%;left:auto;right:0;object-fit:contain;object-position:right center}.terrace-sample .offer-carousel .tuna-banner .offer-shade{background:linear-gradient(90deg,#171722f5 10%,#171722c4 42%,#17172220 85%)}
+
+/* A text-only photo invitation across every menu template. */
+.guest-body .dish-image-wrap>span{left:17px;right:auto;bottom:15px;max-width:calc(100% - 34px);width:auto;padding:0;border:0;border-radius:0;background:none;box-shadow:none;color:#fff;font-size:9px;line-height:1.5;text-shadow:0 1px 4px #000,0 0 12px #000b;pointer-events:none}
