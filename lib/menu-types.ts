@@ -46,6 +46,7 @@ export type MenuEvent = {
 };
 
 export type Menu = {
+  headingStyle?: "sans" | "serif";
   languagePlan?: "core" | "pro";
   translations?: MenuTranslation[];
   restaurantName: string;

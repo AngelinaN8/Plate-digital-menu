@@ -83,6 +83,7 @@ export async function validateMenu(value: unknown, ownerId: string): Promise<Men
   if (!/^[A-Z]{3}$/.test(currency)) throw new ApiError(400, "Use a three-letter currency code, such as AED.");
   const accent = textValue(raw.accent, "brand colour", 7, true);
   if (!/^#[a-fA-F0-9]{6}$/.test(accent)) throw new ApiError(400, "Choose a valid brand colour.");
+  const headingStyle = raw.headingStyle === "serif" ? "serif" : "sans";
   const seen = new Set<string>();
   const dishes: Dish[] = [];
   for (const item of raw.dishes) {
@@ -151,7 +152,7 @@ export async function validateMenu(value: unknown, ownerId: string): Promise<Men
   const baseForTranslation={restaurantName:raw.restaurantName,tagline:raw.tagline,currency,accent,template,featuredDishIds:featured,promotion,events,dishes} as Menu;
   const requiredTranslationKeys=Object.keys(translationFields(baseForTranslation));
   for(const t of checkedTranslations){if(t.reviewed&&(t.sourceText!==translationSource(baseForTranslation)||requiredTranslationKeys.some(k=>typeof t.values[k]!=='string'||(translationFields(baseForTranslation)[k]&&!t.values[k].trim()))))t.reviewed=false;}
-  return {languagePlan,translations:checkedTranslations, restaurantName: textValue(raw.restaurantName, "restaurant name", 150, true), tagline: textValue(raw.tagline, "tagline", 300), currency, accent, template, featuredDishIds: featured as string[], promotion, events, dishes };
+  return {headingStyle,languagePlan,translations:checkedTranslations, restaurantName: textValue(raw.restaurantName, "restaurant name", 150, true), tagline: textValue(raw.tagline, "tagline", 300), currency, accent, template, featuredDishIds: featured as string[], promotion, events, dishes };
 }
 
 export async function validatePhoto(value: unknown, ownerId: string) {
