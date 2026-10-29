@@ -1,0 +1,60 @@
+{
+  "/images/13-ribeye.jpg": {
+    "name": "Ribeye & potato tarte tatin",
+    "creditText": "Restaurant № 13, Moscow",
+    "source": "https://yandex.com/maps/org/restoran_13/135875441483/menu/",
+    "copyrightNotice": "Photograph remains the property of its respective owner. Independently selected visual reference; not Plate client work or a restaurant endorsement.",
+    "description": "Scaled for web delivery and cropped for display in a fictional sample menu."
+  },
+  "/images/13-salmon.jpg": {
+    "name": "Salmon bowl",
+    "creditText": "Restaurant № 13, Moscow",
+    "source": "https://yandex.com/maps/org/restoran_13/135875441483/menu/",
+    "copyrightNotice": "Photograph remains the property of its respective owner. Independently selected visual reference; not Plate client work or a restaurant endorsement.",
+    "description": "Scaled for web delivery and cropped for display in a fictional sample menu."
+  },
+  "/images/13-tomato.jpg": {
+    "name": "Tomatoes & stracciatella",
+    "creditText": "Restaurant № 13, Moscow",
+    "source": "https://yandex.com/maps/org/restoran_13/135875441483/menu/",
+    "copyrightNotice": "Photograph remains the property of its respective owner. Independently selected visual reference; not Plate client work or a restaurant endorsement.",
+    "description": "Scaled for web delivery and cropped for display in a fictional sample menu."
+  },
+  "/images/tokyo-salad.jpg": {
+    "name": "Shrimp, spinach & kale",
+    "creditText": "Tokyo, Moscow",
+    "source": "https://yandex.com/maps/org/tokyo/83330029544/menu/",
+    "copyrightNotice": "Photograph remains the property of its respective owner. Independently selected visual reference; not Plate client work or a restaurant endorsement.",
+    "description": "Scaled for web delivery and cropped for display in a fictional sample menu."
+  },
+  "/images/tokyo-tiradito.jpg": {
+    "name": "Akami tuna tiradito",
+    "creditText": "Tokyo, Moscow",
+    "source": "https://yandex.com/maps/org/tokyo/83330029544/menu/",
+    "copyrightNotice": "Photograph remains the property of its respective owner. Independently selected visual reference; not Plate client work or a restaurant endorsement.",
+    "description": "Scaled for web delivery and cropped for display in a fictional sample menu."
+  },
+  "/images/tokyo-toro.jpg": {
+    "name": "Tuna Toro sashimi",
+    "creditText": "Tokyo, Moscow",
+    "source": "https://yandex.com/maps/org/tokyo/83330029544/menu/",
+    "copyrightNotice": "Photograph remains the property of its respective owner. Independently selected visual reference; not Plate client work or a restaurant endorsement.",
+    "description": "Scaled for web delivery and cropped for display in a fictional sample menu."
+  },
+  "/images/steak-rossini-real.jpg": {
+    "name": "Steak Rossini",
+    "creditText": "kennejima / Wikimedia Commons",
+    "creator": "kennejima",
+    "source": "https://commons.wikimedia.org/wiki/File:Tournedos_Rossini_with_Truffle_Madeira_Sauce.jpg",
+    "license": "https://creativecommons.org/licenses/by/2.0/",
+    "description": "Scaled for web delivery and cropped for display."
+  },
+  "/images/tuna-cutting-licensed.jpg": {
+    "name": "Live tuna cutting",
+    "creditText": "ウィ貴公子 / Wikimedia Commons",
+    "creator": "ウィ貴公子",
+    "source": "https://commons.wikimedia.org/wiki/File:202408031137_DSCN1854.jpg",
+    "license": "https://creativecommons.org/licenses/by-sa/4.0/",
+    "description": "Scaled for web delivery and cropped for display."
+  }
+}
