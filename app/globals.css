@@ -196,3 +196,5 @@ img[src="/images/tomato-fusilli-plated.jpg"]{object-position:50% 68%}.terrace-sa
 .terrace-sample .dish-image-wrap img{width:100%;height:100%;display:block}.terrace-sample img[src="/images/terrace-burrata-editorial.jpg"]{object-position:50% 53%}
 
 .terrace-sample .dish-image-wrap{width:100%;aspect-ratio:auto}
+
+.terrace-sample .dish-image-wrap img{filter:none;transform:none;object-position:center;width:100%;height:100%}.terrace-sample img[src="/images/tokyo-salad.jpg"],.terrace-sample img[src="/images/tokyo-toro.jpg"]{object-fit:contain;background:#efeeeb}
