@@ -8,9 +8,9 @@
   "dish.garden-salad.allergen.0": "حليب",
   "dish.tomato-pasta.name": "فوسيللي بالطماطم",
   "dish.tomato-pasta.category": "مقبلات",
-  "dish.tomato-pasta.description": "فوسيلي، صلصة طماطم مطهوة ببطء، الريحان وزيت الزيتون البكر الممتاز.",
+  "dish.tomato-pasta.description": "فوسيلي مع الطماطم الكرزية والأعشاب وجبن البارميزان والجوز.",
   "dish.tomato-pasta.portion": "مقبلات · 220 جم · تكفي شخصاً واحداً",
-  "dish.tomato-pasta.preparation": "معكرونة حلزونية بصلصة الطماطم، تُزين بالأعشاب الطازجة وتُقدم ساخنة.",
+  "dish.tomato-pasta.preparation": "معكرونة حلزونية مع الأعشاب والطماطم الكرزية، تُزين بشرائح البارميزان والجوز وتُقدم ساخنة.",
   "dish.tomato-pasta.allergen.0": "قمح",
   "dish.steak-rossini.name": "ستيك روسيني",
   "dish.steak-rossini.category": "الأطباق الرئيسية",
@@ -63,5 +63,7 @@
   "event.tuna-sunday.note.tuna-sashimi": "مقطع حسب الطلب · السعر حسب القائمة",
   "event.tuna-sunday.note.tuna-ceviche": "متبلة بالحمضيات · يُطبق سعر القائمة",
   "promotion.title": "",
-  "promotion.description": ""
+  "promotion.description": "",
+  "dish.tomato-pasta.allergen.1": "حليب",
+  "dish.tomato-pasta.allergen.2": "مكسرات شجرية"
 }

@@ -181,3 +181,11 @@ img[src="/images/tomato-fusilli-plated.jpg"]{object-position:50% 68%}.terrace-sa
 
 /* A text-only photo invitation across every menu template. */
 .guest-body .dish-image-wrap>span{left:17px;right:auto;bottom:15px;max-width:calc(100% - 34px);width:auto;padding:0;border:0;border-radius:0;background:none;box-shadow:none;color:#fff;font-size:9px;line-height:1.5;text-shadow:0 1px 4px #000,0 0 12px #000b;pointer-events:none}
+
+/* The Terrace: close plated dishes with a quiet, warm restaurant treatment. */
+.terrace-sample .dish-image-wrap img,.terrace-sample .dish-modal>div:first-child>img,.terrace-sample .offer-included-item>img{filter:saturate(.91) sepia(.06) contrast(.97);object-fit:cover}.terrace-sample img[src="/images/terrace-garden-salad.jpg"]{object-position:50% 53%}.terrace-sample img[src="/images/terrace-tomato-fusilli.jpg"]{object-position:50% 64%}.terrace-sample img[src="/images/tuna-sashimi-plated.jpg"]{object-position:50% 50%}
+
+/* Consistent close restaurant photography; native emoji rendering is never used. */
+.next-orbit{width:104px;height:104px;font-size:0}.next-orbit svg{display:block;width:100%;height:100%}.terrace-sample .dish-image-wrap{aspect-ratio:1.65}.terrace-sample .dish-image-wrap img,.terrace-sample .dish-modal>div:first-child>img,.terrace-sample .offer-included-item>img{filter:saturate(.84) sepia(.08) contrast(.96);object-position:center}.terrace-sample img[src="/images/terrace-fusilli-cohesive.jpg"]{object-position:50% 58%}.terrace-sample img[src="/images/terrace-sashimi-cohesive.jpg"]{object-position:50% 55%}@media(max-width:540px){.next-orbit{width:76px;height:76px;right:0;top:-9px}}
+
+.terrace-sample .dish-image-wrap img[src="/images/terrace-sashimi-cohesive.jpg"]{transform:scale(1.32);object-position:50% 54%}.terrace-sample .dish-image-button:hover img[src="/images/terrace-sashimi-cohesive.jpg"]{transform:scale(1.35)}
